@@ -2,7 +2,7 @@
 # Author: itsOiK
 # Date: 02/06-22
 # v0.0.3: 30/11-22
-#TODO implement         if bpy.data.is_dirty:
+# TODO implement         if bpy.data.is_dirty:
 
 import bpy
 from bpy.app.handlers import persistent
@@ -10,7 +10,7 @@ from typing import Union, Any
 import datetime as dt
 
 SAVE_INTERVAL: float = 120.0
-INITIAL_WAIT: float = 30.0
+INITIAL_WAIT: float = 15.0
 CONTINUE: bool = True
 PATH: Union[None, str] = None
 
@@ -36,8 +36,10 @@ def auto_save() -> Union[int, None]:
         location = "\\".join(path.split("\\")[:-1])
         now = dt.datetime.now().strftime(("%H:%M:%S"))
         # bpy.ops.wm.save_mainfile()
-        bpy.ops.wm.save_as_mainfile(filepath=location + "\\_" + filename, copy=True)
-        _print(f"{now} - SAVING: '{filename}' - **** YOU BLENDER AUTOSAVE!\nlocation:{location}")
+        bpy.ops.wm.save_as_mainfile(
+            filepath=location + "\\_" + filename, copy=True)
+        _print(
+            f"{now} - SAVING: '{filename}' - **** YOU BLENDER AUTOSAVE!\nlocation:{location}")
 
     else:
         bpy.ops.wm.save_mainfile('INVOKE_AREA')
@@ -65,7 +67,7 @@ def load_handler(dummy: Any) -> None:
     """
     global INITIAL_WAIT
     global SAVE_INTERVAL
-    
+
     path = "New File: Untitled.blend"
     wait = INITIAL_WAIT
     if bpy.data.filepath:
