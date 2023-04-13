@@ -2,7 +2,6 @@
 # Author: itsOiK
 # Date: 02/06-22
 # v0.0.4: 30/11-22
-# TODO implement         if bpy.data.is_dirty:
 
 import bpy
 from bpy.app.handlers import persistent
@@ -23,8 +22,21 @@ bl_info = {
     "description": "Because blender autosave can go **** a donkey!"
 }
 
+# TODO add info popup when saving
+# class InfoTextOutput(bpy.types.Operator):
+#     bl_idname = "oikautosave.infotextoutput"
+#     bl_label = "Testing Things"
+
+#     def execute(self, context):
+#         _print(context)
+#         self.report({'INFO'}, "test")
+#         return {'FINISHED'}
+
 
 def check_if_dirty() -> bool:
+    """Checks if document is dirty
+    Returns: bool
+    """
     return bpy.data.is_dirty
 
 
@@ -33,27 +45,45 @@ def auto_save() -> Union[int, None]:
     Returns:
         None: ...
     """
-    path = bpy.data.filepath
-    now = dt.datetime.now().strftime(("%H:%M:%S"))
-    _print("path " + path)
-    _print(f"bpy.data.is_dirty { bpy.data.is_dirty}")
 
+    bpy.ops.oikautosave.infotextoutput()
+    path = bpy.data.filepath
     if path and check_if_dirty():
         filename = path.split("\\")[-1]
         location = "\\".join(path.split("\\")[:-1])
-        # bpy.ops.wm.save_mainfile()
         bpy.ops.wm.save_as_mainfile(
             filepath=location + "\\_" + filename, copy=True)
-        _print(
-            f"{now} - SAVING: '{filename}' - **** YOU BLENDER AUTOSAVE!\nlocation:{location}")
+        _print(f"SAVING: '{filename}' - **** YOU BLENDER AUTOSAVE!")
+        _print(f"Location: '{location}'")
     elif not path and check_if_dirty():
         bpy.ops.wm.save_mainfile('INVOKE_AREA')
         _print("Prompted user for initial save")
     elif not check_if_dirty():
-        _print(f"{now} - Skipped saving, not dirty, next attempt in: {INITIAL_WAIT}")
+        _print(f"Skipped saving, not dirty, next attempt in: {INITIAL_WAIT}")
         set_timer(INITIAL_WAIT)
-
     return None
+
+
+def set_timer(amount_to_wait: float = 0) -> None:
+    """Handles setting and or resetting timer
+
+    Args:
+        amount_to_wait (float): amount of time to wait before next save
+    """
+    global CONTINUE
+    if CONTINUE:
+        extra_string = ""
+        if bpy.app.timers.is_registered(auto_save):
+            bpy.app.timers.unregister(auto_save)
+        extra_string += f"Next save in {amount_to_wait} seconds"
+        bpy.app.timers.register(
+            auto_save,
+            first_interval=amount_to_wait,
+            persistent=True
+        )
+        _print(f"{extra_string}")
+    else:
+        _print(f"Stopped AutoSaving")
 
 
 @persistent
@@ -86,39 +116,19 @@ def load_handler(dummy: Any) -> None:
     _print(f"Load Handler Loaded: {path}")
 
 
-def set_timer(amount_to_wait: float) -> None:
-    """Handles setting and or resetting timer
-
-    Args:
-        amount_to_wait (float): amount of time to wait before next save
-    """
-    global CONTINUE
-    if CONTINUE:
-        extra_string = ""
-        if bpy.app.timers.is_registered(auto_save):
-            extra_string = "Timer exsisted, resetting timer, "
-            bpy.app.timers.unregister(auto_save)
-        extra_string += f"Next save in {amount_to_wait} seconds"
-        bpy.app.timers.register(
-            auto_save,
-            first_interval=amount_to_wait,
-            persistent=True
-        )
-        _print(f"{extra_string}")
-    else:
-        _print(f"Stopped AutoSaving")
-
-
 def register() -> None:
     """Register handlers"""
     global CONTINUE
+    CONTINUE = True
     _print("Enabled: Oik's AutoSaver for Blender")
     _print("Setting load-handlers")
     bpy.app.handlers.load_post.append(load_handler)
     _print("Setting save-handlers")
     bpy.app.handlers.save_post.append(save_handler)
+    # TODO add info popup when saving
+    # _print("Setting info output")
+    # bpy.utils.register_class(InfoTextOutput)
     set_timer(INITIAL_WAIT)
-    CONTINUE = True
 
 
 def unregister() -> None:
@@ -128,7 +138,10 @@ def unregister() -> None:
     bpy.app.handlers.load_post.remove(load_handler)
     _print("Removing save-handlers")
     bpy.app.handlers.save_post.remove(save_handler)
-    CONTINUE = False
+    _print("Removing info output")
+    # TODO add info popup when saving
+    # bpy.utils.unregister_class(InfoTextOutput)
+    # CONTINUE = False
     if bpy.app.timers.is_registered(auto_save):
         _print("Removing AutoSave timer")
         bpy.app.timers.unregister(auto_save)
@@ -139,9 +152,10 @@ def _print(string: str) -> None:
     """i got bored...
 
     Args:
-        string (str): duh!...
+        string (str): string to print
     """
-    print(f"[Oik's AutoSaver]: {string}")
+    now = dt.datetime.now().strftime(("%H:%M:%S"))
+    print(f"[Oik's AutoSaver]: {now} - {string}")
 
 
 if __name__ == "__main__":
