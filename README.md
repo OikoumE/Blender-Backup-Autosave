@@ -13,6 +13,8 @@
 > adding info popup at the bottom of blender when saving
 > https://docs.blender.org/api/current/bpy.types.Operator.html
 >
+> https://blender.stackexchange.com/questions/109711/how-to-popup-simple-message-box-from-python-console
+>
 > guide:
 >
 > > https://pastebin.com/QF83xPrc
@@ -20,5 +22,3 @@
 > > https://darkfallblender.blogspot.com/2020/12/blender-python-tutorial-how-to-display.html
 >
 > > https://www.youtube.com/watch?v=TgQ9ahMuDMw
->
-> https://blender.stackexchange.com/questions/109711/how-to-popup-simple-message-box-from-python-console
