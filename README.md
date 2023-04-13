@@ -1,7 +1,7 @@
 # Blender-Backup-Autosave
 
-# changelog:
+> # changelog:
 
-> v0.0.3:
->
+> > v0.0.3:
+> >
 > > adding a checker to see if document "is dirty" before saving and before prompting user on initial save
