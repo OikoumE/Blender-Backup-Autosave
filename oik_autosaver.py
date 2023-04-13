@@ -1,7 +1,7 @@
 # File: oik_autosaver.py - **** YOU BLENDER AUTOSAVE
 # Author: itsOiK
 # Date: 02/06-22
-# v0.0.3: 30/11-22
+# v0.0.4: 30/11-22
 # TODO implement         if bpy.data.is_dirty:
 
 import bpy
@@ -19,31 +19,40 @@ bl_info = {
     "blender": (3, 0, 2),
     "category": "Object",
     "author": "ItsOik",
-    "version": (0, 0, 3),
+    "version": (0, 0, 4),
     "description": "Because blender autosave can go **** a donkey!"
 }
 
 
+def check_if_dirty() -> bool:
+    return bpy.data.is_dirty
+
+
 def auto_save() -> Union[int, None]:
     """Does the saving
-    asdasdas
     Returns:
         None: ...
     """
     path = bpy.data.filepath
-    if path:
+    now = dt.datetime.now().strftime(("%H:%M:%S"))
+    _print("path " + path)
+    _print(f"bpy.data.is_dirty { bpy.data.is_dirty}")
+
+    if path and check_if_dirty():
         filename = path.split("\\")[-1]
         location = "\\".join(path.split("\\")[:-1])
-        now = dt.datetime.now().strftime(("%H:%M:%S"))
         # bpy.ops.wm.save_mainfile()
         bpy.ops.wm.save_as_mainfile(
             filepath=location + "\\_" + filename, copy=True)
         _print(
             f"{now} - SAVING: '{filename}' - **** YOU BLENDER AUTOSAVE!\nlocation:{location}")
-
-    else:
+    elif not path and check_if_dirty():
         bpy.ops.wm.save_mainfile('INVOKE_AREA')
         _print("Prompted user for initial save")
+    elif not check_if_dirty():
+        _print(f"{now} - Skipped saving, not dirty, next attempt in: {INITIAL_WAIT}")
+        set_timer(INITIAL_WAIT)
+
     return None
 
 
@@ -91,7 +100,10 @@ def set_timer(amount_to_wait: float) -> None:
             bpy.app.timers.unregister(auto_save)
         extra_string += f"Next save in {amount_to_wait} seconds"
         bpy.app.timers.register(
-            auto_save, first_interval=amount_to_wait, persistent=True)
+            auto_save,
+            first_interval=amount_to_wait,
+            persistent=True
+        )
         _print(f"{extra_string}")
     else:
         _print(f"Stopped AutoSaving")
