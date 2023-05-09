@@ -1,7 +1,8 @@
 # File: oik_autosaver.py - **** YOU BLENDER AUTOSAVE
 # Author: itsOiK
 # Date: 02/06-22
-# v0.0.4: 30/11-22
+# v0.0.3: 30/11-22
+# v0.0.4: 13/04-23
 
 import bpy
 from bpy.app.handlers import persistent
