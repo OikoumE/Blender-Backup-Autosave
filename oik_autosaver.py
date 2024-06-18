@@ -84,6 +84,8 @@ def auto_save() -> Union[int, None]:
                 filepath=location + "\\_" + filename, copy=True)
             _print(f"SAVING: '{filename}' - **** YOU BLENDER AUTOSAVE!")
             _print(f"Location: '{location}'")
+            #TODO attempted setting back to dirty to not interfere with how "dirty" should work
+            #bpy.data.is_dirty = True
         else:
             # is not exsisting project
             bpy.ops.wm.save_mainfile('INVOKE_AREA')
